@@ -1,0 +1,79 @@
+
+#
+# ORM example where types should be derived
+# If I can allow the type system to derive types like this, without Halting problems or too dark magic, that'd be super cool! No idea where to start.
+# How to deal with query structure that depends on runtime information?
+#
+
+#
+# Data model part (ids implicit here)
+#
+
+class Table<User>:
+    name: Field<String>
+    birthday: Field<Date?>
+
+class Table<Account>:
+    name: Field<String>
+    description: Field<String?>
+
+class Table<Transfer>:
+    date: Field<Date>
+    creator: Field<User?>
+
+class Table<Line>:
+    transfer: Field<Transfer>
+    account: Field<Account>
+    amount: Field<Decimal>
+
+#
+# Query part
+# (Syntax totally subject to change or complete overhaul)
+#
+select Table<Transfer> { date, creator }
+    .inner_join { Table<Line>.transfer } { amount }
+    .left_join { Table<Transfer>.creator } { name, birthday }
+    .where { and (
+        Table<Transfer>.date > today() - datespan(days=7),
+        Table<Line>.amount > 0
+    )}
+
+# This would:
+# - Start a select query
+# - Get all fields (`date` and `creator`) from Transfer
+# - Join the table Line through the key of `Line.transfer`
+#   + This uniquely identifies the relationship, without room for forgotten indices
+#   + This only compiles if the identifier exists, but should also only if it points to a known relation (Transfer being the only choice here)
+# - Only joins `amount` from Line
+# - Join the table User, because that's where Transfer (already joined) points
+# - Get some fields, noting that the link is optional
+# Note that the tables may have aliasses, e.g. `class Table<User> := UserT:`
+
+#
+# The result
+#
+# The resulting types should be line this:
+#
+result = List<TransferResult>
+class TransferResult:
+    date: Date
+    creator: UserResult?
+    lines: List<LineResult>
+class UserResult:
+    name: String
+    birthday: Date?
+class LineResult:
+    amount: Decimal
+
+#
+# The data should be computed using these queries
+# (An alternative is joining user, which'd be fewer queries but prevents duplicates)
+# Note that this splitting doesn't work if there are relations between tables in the where clause
+#
+select transferId, date, creatorUserId from Transfer where date > $today() - datespan(days=7)$
+select lineId, transferId, amount from Line where transferId in ($transferId from above$)
+select userId, name, birthday from User where userId in ($creatorUserId from above$)
+# The latter two are sent in parallel
+# The results are then joined into the above data structure, with multiple references to the same user (possibly)
+
+
