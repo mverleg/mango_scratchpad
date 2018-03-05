@@ -19,11 +19,11 @@ class Table<Account>:
 
 class Table<Transfer>:
     date: Field<Date>
-    creator: Field<User?>
+    creator: Relation<User?>
 
 class Table<Line>:
-    transfer: Field<Transfer>
-    account: Field<Account>
+    transfer: Relation<Transfer>
+    account: Relation<Account>
     amount: Field<Decimal>
 
 #
