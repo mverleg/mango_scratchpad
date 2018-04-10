@@ -76,4 +76,9 @@ select userId, name, birthday from User where userId in ($creatorUserId from abo
 # The latter two are sent in parallel
 # The results are then joined into the above data structure, with multiple references to the same user (possibly)
 
+# EDIT
+# Mango: in addition to the ORM stuff, I want the result of
+#     select name, age, address from User
+# to be polymorphically assigneable to type of
+#     select name, age from User
 
