@@ -11,13 +11,14 @@ class User:
     accounts: Relations<out Account>
 
 # This stuff should get implemented depending on what kind of query is done
-impl User_Id for User {}
-impl User_Timestamp for User {}
-impl User_Name for User {}
-impl User_Birthday for User {}
-impl User_SavingAccounts for User {}
-impl User_SpendingAccounts for User {}
-impl User_AllAccounts for User {}
+trait IUser
+trait User_Id required IUser { fn id() }
+trait User_Timestamp required IUser { fn timestamp() }
+trait User_Name required IUser { fn name() }
+trait User_Birthday required IUser { fn birthday() }
+trait User_SavingAccounts<Relations<T>> requires IUser where T: IAccount { fn saving_accounts() }
+trait User_SpendingAccounts<Relations<T>> requires IUser where T: IAccount { fn spending_accounts() }
+trait User_AllAccounts<Relations<T>> requires IUser where T: IAccount { fn accounts() }
 # TODO: somehow AllAccounts implies SavingAccounts and SpendingAccounts
 
 class Account:
@@ -26,6 +27,13 @@ class Account:
     description: String?
     transfers_from: Relations<out Transfer>
     transfers_to: Relations<out Transfer>
+
+trait IAccount {}
+trait Account_User requires IAccount { fn user() }
+trait Account_Name requires IAccount { fn name() }
+trait Account_Description requires IAccount { fn description() }
+trait Account_TransfersFrom requires IAccount { fn transfers_from() }
+trait Account_TransfersTo requires IAccount { fn transfers_to() }
 
 class Transfer:
     from: Account
@@ -43,6 +51,14 @@ class Line:
 #
 
 # TODO: which style, generic like from_user or interface like to_user?
-fun amt_to_user_since(from_user: $User_SpendingAccounts, to_user: User_Id, since_date: Date):
-    clz
+fun amt_to_user_since<U: User_SpendingAccounts<A>, A: Account_TransfersFrom>(from_user: U, to_user: #User_Id, since_date: Date):
+
+    let total = 0
+    for acc in from_user.spending_accounts():
+        for transf in acc.transfers_from():
+            for line transf.lines():
+                total += line.amount()
+
+    return total
+
 
