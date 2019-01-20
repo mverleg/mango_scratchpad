@@ -1,5 +1,6 @@
 
-class Authorization {}
+class Authorization:
+    pass
 
 trait Authenticated:
     pass

@@ -1,6 +1,6 @@
 
 #
-# ORM example of composing types for invididual fields
+# ORM example of composing types for individual fields
 #
 
 class User:
@@ -11,14 +11,22 @@ class User:
     accounts: Relations<out Account>
 
 # This stuff should get implemented depending on what kind of query is done
-trait IUser {}
-trait User_Id required IUser { fn id() }
-trait User_Timestamp required IUser { fn timestamp() }
-trait User_Name required IUser { fn name() }
-trait User_Birthday required IUser { fn birthday() }
-trait User_SavingAccounts<Relations<T>> requires IUser where T: IAccount { fn saving_accounts() }
-trait User_SpendingAccounts<Relations<T>> requires IUser where T: IAccount { fn spending_accounts() }
-trait User_AllAccounts<Relations<T>> requires IUser where T: IAccount { fn accounts() }
+trait IUser:
+    pass
+trait User_Id required IUser:
+    fn id()
+trait User_Timestamp required IUser:
+    fn timestamp()
+trait User_Name required IUser:
+    fn name()
+trait User_Birthday required IUser:
+    fn birthday()
+trait User_SavingAccounts<Relations<T>> requires IUser where T: IAccount:
+    fn saving_accounts()
+trait User_SpendingAccounts<Relations<T>> requires IUser where T: IAccount:
+    fn spending_accounts()
+trait User_AllAccounts<Relations<T>> requires IUser where T: IAccount:
+    fn accounts()
 # TODO: somehow AllAccounts implies SavingAccounts and SpendingAccounts
 
 class Account:
@@ -28,12 +36,18 @@ class Account:
     transfers_from: Relations<out Transfer>
     transfers_to: Relations<out Transfer>
 
-trait IAccount {}
-trait Account_User requires IAccount { fn user() }
-trait Account_Name requires IAccount { fn name() }
-trait Account_Description requires IAccount { fn description() }
-trait Account_TransfersFrom<Relations<T>> requires IAccount where T: ITransfer { fn transfers_from() }
-trait Account_TransfersTo<Relations<T>>  requires IAccount where T: ITransfer { fn transfers_to() }
+trait IAccount:
+    pass
+trait Account_User requires IAccount:
+    fn user()
+trait Account_Name requires IAccount:
+    fn name()
+trait Account_Description requires IAccount:
+    fn description()
+trait Account_TransfersFrom<Relations<T>> requires IAccount where T: ITransfer:
+    fn transfers_from()
+trait Account_TransfersTo<Relations<T>>  requires IAccount where T: ITransfer:
+    fn transfers_to()
 
 class Transfer:
     from: Account
@@ -41,21 +55,30 @@ class Transfer:
     creator: User?
     lines: Relations<Lines>
 
-trait ITransfer {}
-trait Transfer_From requires ITransfer { fn from() }
-trait Transfer_Date requires ITransfer { fn date() }
-trait Transfer_Creator requires ITransfer { fn creator() }
-trait Transfer_Lines<Relations<T>> where T: ILine requires ITransfer { fn lines() }
+trait ITransfer:
+    pass
+trait Transfer_From requires ITransfer:
+    fn from()
+trait Transfer_Date requires ITransfer:
+    fn date()
+trait Transfer_Creator requires ITransfer:
+    fn creator()
+trait Transfer_Lines<Relations<T>> where T: ILine requires ITransfer:
+    fn lines()
 
 class Line:
     to: Account
     transfer: Transfer
     amount: Amount
 
-trait ILine {}
-trait Line_To requires ILine { fn to() }
-trait Line_Transfer requires ILine { fn transfer() }
-trait Line_Amount requires ILine { fn amount() }
+trait ILine:
+    pass
+trait Line_To requires ILine:
+    fn to()
+trait Line_Transfer requires ILine:
+    fn transfer()
+trait Line_Amount requires ILine:
+    fn amount()
 
 #
 # Usage examples
