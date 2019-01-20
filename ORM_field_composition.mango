@@ -11,7 +11,7 @@ class User:
     accounts: Relations<out Account>
 
 # This stuff should get implemented depending on what kind of query is done
-trait IUser
+trait IUser {}
 trait User_Id required IUser { fn id() }
 trait User_Timestamp required IUser { fn timestamp() }
 trait User_Name required IUser { fn name() }
@@ -32,8 +32,8 @@ trait IAccount {}
 trait Account_User requires IAccount { fn user() }
 trait Account_Name requires IAccount { fn name() }
 trait Account_Description requires IAccount { fn description() }
-trait Account_TransfersFrom requires IAccount { fn transfers_from() }
-trait Account_TransfersTo requires IAccount { fn transfers_to() }
+trait Account_TransfersFrom<Relations<T>> requires IAccount where T: ITransfer { fn transfers_from() }
+trait Account_TransfersTo<Relations<T>>  requires IAccount where T: ITransfer { fn transfers_to() }
 
 class Transfer:
     from: Account
@@ -41,24 +41,35 @@ class Transfer:
     creator: User?
     lines: Relations<Lines>
 
+trait ITransfer {}
+trait Transfer_From requires ITransfer { fn from() }
+trait Transfer_Date requires ITransfer { fn date() }
+trait Transfer_Creator requires ITransfer { fn creator() }
+trait Transfer_Lines<Relations<T>> where T: ILine requires ITransfer { fn lines() }
+
 class Line:
     to: Account
     transfer: Transfer
     amount: Amount
+
+trait ILine {}
+trait Line_To requires ILine { fn to() }
+trait Line_Transfer requires ILine { fn transfer() }
+trait Line_Amount requires ILine { fn amount() }
 
 #
 # Usage examples
 #
 
 # TODO: which style, generic like from_user or interface like to_user?
-fun amt_to_user_since<U: User_SpendingAccounts<A>, A: Account_TransfersFrom>(from_user: U, to_user: #User_Id, since_date: Date):
+fn amt_to_user_since<U: User_SpendingAccounts<A>, A: Account_TransfersFrom<L> & Transfer_Date, L: Line_Amount>(from_user: U, to_user: #User_Id, since_date: Date):
 
     let total = 0
     for acc in from_user.spending_accounts():
         for transf in acc.transfers_from():
-            for line transf.lines():
-                total += line.amount()
-
+            if trans.date() >= since_date:
+                for line transf.lines():
+                    total += line.amount()
     return total
 
 
