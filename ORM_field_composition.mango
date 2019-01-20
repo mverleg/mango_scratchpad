@@ -1,0 +1,48 @@
+
+#
+# ORM example of composing types for invididual fields
+#
+
+class User:
+    id: Id
+    last_changed: Timestamp
+    name: String
+    birthday: Date?
+    accounts: Relations<out Account>
+
+# This stuff should get implemented depending on what kind of query is done
+impl User_Id for User {}
+impl User_Timestamp for User {}
+impl User_Name for User {}
+impl User_Birthday for User {}
+impl User_SavingAccounts for User {}
+impl User_SpendingAccounts for User {}
+impl User_AllAccounts for User {}
+# TODO: somehow AllAccounts implies SavingAccounts and SpendingAccounts
+
+class Account:
+    user: User
+    name: String
+    description: String?
+    transfers_from: Relations<out Transfer>
+    transfers_to: Relations<out Transfer>
+
+class Transfer:
+    from: Account
+    date: Date
+    creator: User?
+    lines: Relations<Lines>
+
+class Line:
+    to: Account
+    transfer: Transfer
+    amount: Amount
+
+#
+# Usage examples
+#
+
+# TODO: which style, generic like from_user or interface like to_user?
+fun amt_to_user_since(from_user: $User_SpendingAccounts, to_user: User_Id, since_date: Date):
+    clz
+
