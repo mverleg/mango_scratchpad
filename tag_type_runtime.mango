@@ -1,0 +1,42 @@
+
+class Authorization {}
+
+trait Authenticated:
+    pass
+trait CanViewFinancialHistory:
+    fn financial_history_view_duration() -> Duration
+
+fn authenticate<T>(authorization: T, session_id: String) -> Result<T + Authenticated, AuthErr>:
+    if not is_known_session(session_id):
+        return AuthErr::UnknownSession
+    # todo: if Authenticated had logic, there'd have to be a way to remember which implementation
+    # todo: if there are orphan rules (like Rust), this'd have to be guaranteed to be a unique impl (possibly use a named, existing impl?)
+    impl tag #Authenticated for authorization;
+    Ok(authorization)
+
+# todo: somehow make this conditional only if referenced from method
+# This would be the only allowed impl with orphan rules (which in this particular case is actually desirable)
+conditional impl FinHistImpl:
+    impl #CanViewFinancialHistory for Authenticated:
+
+
+fn check_financial_history_authorization<T: Authenticated>(authorization: T) -> Result<T + CanViewFinancialHistory, AuthErr>:
+    if not do_we_allow_this():
+        return AuthErr::Denied
+    impl #CanViewFinancialHistory for authorization
+    Ok(authorization)
+
+
+fn do_logic_to_see_financial_history<T: CanViewFinancialHistory>(authorization: T):
+    # At this point it is guaranteed that the user has the authorization
+    # with the added benefit that 1) types all the way up the stack show the requirement, and 2) many authorization bugs are compile errors
+
+
+fn main():
+    let authorization = Authorization::none()
+    if let Ok(authorization) = authenticate(authorization, session_id):
+        if let Ok(authorization) = check_financial_history_authorization(authorization):
+            do_logic_to_see_financial_history(authorization)
+            return
+    # access denied
+
