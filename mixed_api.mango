@@ -1,0 +1,45 @@
+
+
+# build-in type that is usable from generated interfaces
+type Validation<T> = Result<T, String>
+
+
+pub class Path:
+    pub fn from_str(text: String) -> Validation<Path>
+        # ...
+
+    pub fn from_parts(vararg parts: String) -> Validation<Path>:
+        # ...
+
+
+pub class NonNegativeInt:
+    pub fn new(nr: int) -> Validation<NonNegativeInt>:
+        # ...
+
+
+# todo: looking at this, it doesn't seem ideal to do this with annotations after all, too many details per param... it seemed easy for simple commands
+@CLI(
+    user_config=join(user_dir(), ".find.conf"),
+    project_config="project_find.config"
+)
+pub fn find(
+        @Param(help="The root directory to search within", positional=true, cli="root", config="root", env="FIND_ROOT")
+        # todo: how to know it's from_str rather than from_parts?
+        # todo: this would give a validation
+        root: Path = cwd(),
+
+        @Param(help="Pattern to search for", cli_long="name")
+        name: Regex = Regex::new(r"*"),
+
+        @Param(help="Pattern to search for", cli_short="-d", cli_long="--max-depth", config="max_depth", env="MAX_DEPTH")
+        max_depth: NonNegativeInt,
+    ):
+        my_find(root, name, max_depth)
+
+
+@REST('localhost:1234')
+pub interface _:
+
+    @URL('/find/')
+    find = find
+
