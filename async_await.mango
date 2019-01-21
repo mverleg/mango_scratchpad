@@ -1,0 +1,24 @@
+
+async fn main():
+    # Single
+    let results = await do_query("select password from users")
+    # Race
+    let fastest_rainfall = await race([
+        rest('www.just-some-fake-weather-website.org/tomorrow').map(it.rainfall),
+        rest('another-fictional-site.gov.nl').map(it.weather.tomorrow.rain)
+    ])
+    # All
+    let transactions = [
+        (await rest('my-api.org/spending-accounts'))
+        (await rest('my-api.org/saving-accounts'))
+    ] | map await it
+        | map(rest("my-api.org/transactions/${it.account_number}"))
+        | all(it)
+    # Queue new events
+    
+    # Heavy work
+
+
+
+# todo: explicit event loop instead of implicit main?
+
