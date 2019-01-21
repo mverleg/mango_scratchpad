@@ -11,12 +11,20 @@ async fn main():
     let transactions = [
         (await rest('my-api.org/spending-accounts'))
         (await rest('my-api.org/saving-accounts'))
-    ] | map await it
+    ] | map(await it)
         | map(rest("my-api.org/transactions/${it.account_number}"))
         | all(it)
     # Queue new events
-    
+
     # Heavy work
+
+
+async fn rest(url: URL) -> Promise<JSON>:
+    # (...)
+
+
+async fn do_query(query: String) -> Promise<List<Row>>:
+    # (...)
 
 
 
