@@ -11,9 +11,10 @@ async fn main():
     let transactions = [
         (await rest('my-api.org/spending-accounts'))
         (await rest('my-api.org/saving-accounts'))
-    ] | map(await it)
-        | map(rest("my-api.org/transactions/${it.account_number}"))
-        | all(it)
+    ] |
+        map(await it) |
+        map(rest("my-api.org/transactions/${it.account_number}")) |
+        all(it)
     # Queue new events
 
     # Heavy work
@@ -27,6 +28,11 @@ async fn do_query(query: String) -> Promise<List<Row>>:
     # (...)
 
 
+# Some things to pay attention to:
+# - How to add more things to event loop? (i.e. just using async/await always leaving 1 thing in loop).
+# - How to turn existing code into async/await? I.e. database drivers should add their results to loop. (How to know which queue?)
+# - Specify which queue to queue at, or to await at? Lot of verbosity passing queue around, for few cases...
+# - How to do thread multiplexing? If at all
 
 # todo: explicit event loop instead of implicit main?
 
