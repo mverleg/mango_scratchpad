@@ -41,3 +41,7 @@ fn main():
             return
     # access denied
 
+
+#TODO: note that for input types, MyTrait (generic, concrete; Rust's `<T: MyTrait>` or `impl MyTrait`) and #MyTrait (trait object `Box<dyn MyTrait>`) are enough
+#TODO: but for return types, there is a distinction between 'chosen by method' (like rust `impl MyTrait` or associated type) and 'chosen by caller' (like Rust generics)
+

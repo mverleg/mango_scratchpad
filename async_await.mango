@@ -16,8 +16,9 @@ async fn main():
         map(rest("my-api.org/transactions/${it.account_number}")) |
         all(it)
     # Queue new events
-
+    # TODO
     # Heavy work
+    # TODO
 
 
 async fn rest(url: URL) -> Promise<JSON>:
