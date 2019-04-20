@@ -1,0 +1,13 @@
+
+# Integer generics / dependent types
+
+# TODO: (this seems like a challenging application for dependent types)
+
+# For a cardgame like Hearts, be able to store the remaining hands in a fixed sized array.
+# 
+# I.e. in round 7, players have 13-6 or 13-7 cards. So a struct like Hands<7> is needed.
+# 
+# After that, for doing minimax, store all future rounds.
+# I.e., in round 7, store rounds 7, 8, 9, 10, 11, 12, 13, each decreasing in size.
+# 
+
