@@ -1,0 +1,61 @@
+
+// This is my attempt at a Rust version, which did not work
+// because the signature does not support per-iter lifetimes.
+// Should be adapted to Mango and the trait fixed to make it work.
+
+truct MyData {
+    lines: Vec<&'static str>,
+}
+
+impl MyData {
+    fn new() -> Self {
+        MyData {
+            lines: vec!["hello", "world", "!!", "and now the really long one which will increase capacity"],
+        }
+    }
+}
+
+impl<'a> IntoIterator for &'a MyData {
+    type Item = &'a mut str;
+    type IntoIter = MyIter<'a>;
+    
+    fn into_iter(self) -> MyIter<'a> {
+        MyIter::new(self)
+    }
+}
+
+struct MyIter<'a> {
+    data: &'a MyData,
+    index: usize,
+    line: String
+}
+
+impl<'a> MyIter<'a> {
+    fn new(data: &'a MyData) -> Self {
+        MyIter {
+            data,
+            index: 0,
+            line: String::with_capacity(8),
+        }
+    }
+}
+
+impl<'a> Iterator for MyIter<'a> {
+    type Item = &'a mut str;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        self.line = self.data.lines[self.index].to_owned();
+        self.index += 1;
+        Some(&mut self.line)
+    }
+}
+
+pub fn main() {
+    let my_data = MyData::new();
+    for line in &my_data {
+        println!("{}", line);
+    }
+}
+
+
+
