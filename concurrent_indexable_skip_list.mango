@@ -1,0 +1,15 @@
+
+# Concurrent Indexable Skiplist
+#
+# Implement indexable skip list in Mango to showcase some advanced features:
+#
+# * Generics
+# * CAS operations
+# * Memory pools
+# * Double-linked list (maybe)
+# * Conditional compile (for map+set, maybe)
+#
+# Note that some compromises or assumptions may be necessary - concurrent exists and indexable exists,
+# but not sure about the combination.
+
+
